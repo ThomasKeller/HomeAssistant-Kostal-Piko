@@ -1,0 +1,71 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Kostal PIKO inverter",
+        "description": "Enter the connection details of your Kostal PIKO web server.",
+        "data": {
+          "host": "Host or IP address",
+          "username": "Username",
+          "password": "Password",
+          "scan_interval": "Scan interval (seconds)",
+          "stop_during_sunset": "Pause polling at night",
+          "latitude": "Latitude (for night pause)",
+          "longitude": "Longitude (for night pause)"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate Kostal PIKO",
+        "description": "The inverter rejected the stored credentials. Please re-enter them.",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not connect to the inverter.",
+      "invalid_auth": "Invalid username or password.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "This inverter is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Kostal PIKO options",
+        "data": {
+          "scan_interval": "Scan interval (seconds)",
+          "stop_during_sunset": "Pause polling at night",
+          "latitude": "Latitude (for night pause)",
+          "longitude": "Longitude (for night pause)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "current_ac_power": { "name": "Current AC power" },
+      "produced_energy": { "name": "Total energy produced" },
+      "daily_energy": { "name": "Energy today" },
+      "status": { "name": "Status" },
+      "efficiency": { "name": "Efficiency" },
+      "string_power": { "name": "PV string power" },
+      "string1_voltage": { "name": "String 1 voltage" },
+      "string1_current": { "name": "String 1 current" },
+      "string1_power": { "name": "String 1 power" },
+      "string2_voltage": { "name": "String 2 voltage" },
+      "string2_current": { "name": "String 2 current" },
+      "string2_power": { "name": "String 2 power" },
+      "l1_voltage": { "name": "L1 voltage" },
+      "l1_power": { "name": "L1 power" },
+      "l2_voltage": { "name": "L2 voltage" },
+      "l2_power": { "name": "L2 power" },
+      "l3_voltage": { "name": "L3 voltage" },
+      "l3_power": { "name": "L3 power" },
+      "download_time": { "name": "Page download time" }
+    }
+  }
+}

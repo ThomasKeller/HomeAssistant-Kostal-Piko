@@ -1,0 +1,71 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Kostal PIKO Wechselrichter",
+        "description": "Verbindungsdaten des Kostal PIKO Webservers eingeben.",
+        "data": {
+          "host": "Host oder IP-Adresse",
+          "username": "Benutzername",
+          "password": "Passwort",
+          "scan_interval": "Abfrageintervall (Sekunden)",
+          "stop_during_sunset": "Abfrage nachts pausieren",
+          "latitude": "Breitengrad (für Nachtpause)",
+          "longitude": "Längengrad (für Nachtpause)"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Kostal PIKO neu anmelden",
+        "description": "Der Wechselrichter hat die hinterlegten Zugangsdaten abgelehnt. Bitte erneut eingeben.",
+        "data": {
+          "username": "Benutzername",
+          "password": "Passwort"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung zum Wechselrichter fehlgeschlagen.",
+      "invalid_auth": "Benutzername oder Passwort ungültig.",
+      "unknown": "Unerwarteter Fehler."
+    },
+    "abort": {
+      "already_configured": "Dieser Wechselrichter ist bereits eingerichtet."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Kostal PIKO Optionen",
+        "data": {
+          "scan_interval": "Abfrageintervall (Sekunden)",
+          "stop_during_sunset": "Abfrage nachts pausieren",
+          "latitude": "Breitengrad (für Nachtpause)",
+          "longitude": "Längengrad (für Nachtpause)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "current_ac_power": { "name": "Aktuelle AC-Leistung" },
+      "produced_energy": { "name": "Gesamtenergie" },
+      "daily_energy": { "name": "Tagesenergie" },
+      "status": { "name": "Status" },
+      "efficiency": { "name": "Wirkungsgrad" },
+      "string_power": { "name": "PV-String-Leistung" },
+      "string1_voltage": { "name": "String 1 Spannung" },
+      "string1_current": { "name": "String 1 Strom" },
+      "string1_power": { "name": "String 1 Leistung" },
+      "string2_voltage": { "name": "String 2 Spannung" },
+      "string2_current": { "name": "String 2 Strom" },
+      "string2_power": { "name": "String 2 Leistung" },
+      "l1_voltage": { "name": "L1 Spannung" },
+      "l1_power": { "name": "L1 Leistung" },
+      "l2_voltage": { "name": "L2 Spannung" },
+      "l2_power": { "name": "L2 Leistung" },
+      "l3_voltage": { "name": "L3 Spannung" },
+      "l3_power": { "name": "L3 Leistung" },
+      "download_time": { "name": "Seiten-Ladezeit" }
+    }
+  }
+}
