@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import timedelta
 
-DOMAIN = "tk_kostal"
+DOMAIN = "kostal_piko"
 
 # Configuration keys
 CONF_HOST = "host"

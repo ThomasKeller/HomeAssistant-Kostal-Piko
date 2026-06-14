@@ -1,10 +1,10 @@
 {
-  "domain": "tk_kostal",
+  "domain": "kostal_piko",
   "name": "Kostal PIKO (TK)",
   "version": "1.0.0",
   "config_flow": true,
-  "documentation": "https://github.com/mailto-tk/ha-kostal",
-  "issue_tracker": "https://github.com/mailto-tk/ha-kostal/issues",
+  "documentation": "https://github.com/mailto-tk/HomeAssistant-Kostal-Piko",
+  "issue_tracker": "https://github.com/mailto-tk/HomeAssistant-Kostal-Piko/issues",
   "codeowners": ["@mailto-tk"],
   "iot_class": "local_polling",
   "integration_type": "device",

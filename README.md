@@ -31,7 +31,7 @@ Ported from the C# project `TK.HA.Kostal`.
 
 ### Manual
 
-Copy `custom_components/tk_kostal` into your Home Assistant
+Copy `custom_components/kostal_piko` into your Home Assistant
 `config/custom_components/` directory and restart Home Assistant.
 
 ## Configuration

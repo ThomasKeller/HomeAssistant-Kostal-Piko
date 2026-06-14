@@ -11,7 +11,7 @@ import pathlib
 import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE.parent / "custom_components" / "tk_kostal"))
+sys.path.insert(0, str(HERE.parent / "custom_components" / "kostal_piko"))
 
 from parser import parse  # noqa: E402  (sys.path tweak)
 
