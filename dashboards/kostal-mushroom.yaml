@@ -1,0 +1,309 @@
+###############################################################################
+# Kostal PIKO companion dashboard - Mushroom edition (Option C)
+# -----------------------------------------------------------------------------
+# Requirements (all from HACS - frontend):
+#   * apexcharts-card     https://github.com/RomRider/apexcharts-card
+#   * mushroom            https://github.com/piitaya/lovelace-mushroom
+#   * power-flow-card-plus  (optional, only if you want the flow card at the
+#                            bottom)  https://github.com/flixlix/power-flow-card-plus
+#
+# Installation:
+#   1. Settings -> Dashboards -> Add Dashboard -> "From YAML" and paste.
+#   2. Entity ids assume the device is named "Kostal PIKO" (default).
+#      If you renamed it, search/replace "sensor.kostal_piko_".
+#   3. Adjust the AC power gauge max to match your inverter peak.
+###############################################################################
+
+title: Photovoltaik
+views:
+  - title: PV
+    path: pv
+    icon: mdi:solar-power-variant
+    type: sections
+    max_columns: 3
+    sections:
+
+      # ===== SECTION 1: LIVE-STATUS ========================================
+      - type: grid
+        cards:
+
+          - type: custom:mushroom-title-card
+            title: Photovoltaik
+            subtitle: Live-Daten vom Kostal PIKO
+
+          - type: custom:mushroom-chips-card
+            alignment: center
+            chips:
+              - type: entity
+                entity: sensor.kostal_piko_status
+                icon: mdi:state-machine
+                content_info: state
+              - type: entity
+                entity: sensor.kostal_piko_efficiency
+                icon: mdi:gauge
+                content_info: state
+              - type: entity
+                entity: sensor.kostal_piko_daily_energy
+                icon: mdi:calendar-today
+                content_info: state
+              - type: entity
+                entity: sensor.kostal_piko_produced_energy
+                icon: mdi:counter
+                content_info: state
+
+          # Hero card - current AC power, big
+          - type: custom:mushroom-template-card
+            primary: "{{ states('sensor.kostal_piko_current_ac_power') }} W"
+            secondary: Aktuelle AC-Leistung
+            icon: mdi:solar-power
+            icon_color: |
+              {% set p = states('sensor.kostal_piko_current_ac_power') | int(0) %}
+              {% if p > 3000 %}green
+              {% elif p > 1000 %}amber
+              {% elif p > 100 %}orange
+              {% else %}grey{% endif %}
+            fill_container: true
+            layout: horizontal
+            multiline_secondary: true
+            tap_action:
+              action: more-info
+              entity: sensor.kostal_piko_current_ac_power
+
+          - type: gauge
+            name: AC-Leistung
+            entity: sensor.kostal_piko_current_ac_power
+            min: 0
+            max: 8500           # adjust to your inverter peak power
+            severity:
+              green: 1000
+              yellow: 500
+              red: 0
+            needle: true
+
+      # ===== SECTION 2: INVERTER FLOW =====================================
+      # 3-column "flow" layout: DC (Strings) -> Inverter -> AC (Phases).
+      # Uses mushroom cards in a grid; reads left-to-right as the energy flow.
+      - type: grid
+        cards:
+
+          - type: custom:mushroom-title-card
+            title: Wechselrichter
+            subtitle: DC → Inverter → AC
+
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+
+              # ---- DC side -------------------------------------------------
+              - type: vertical-stack
+                cards:
+                  - type: custom:mushroom-template-card
+                    primary: String 1
+                    secondary: >-
+                      {{ states('sensor.kostal_piko_string1_voltage') }} V ·
+                      {{ states('sensor.kostal_piko_string1_current') }} A
+                    icon: mdi:current-dc
+                    icon_color: deep-orange
+                    badge_icon: mdi:flash
+                    badge_color: deep-orange
+                  - type: custom:mushroom-entity-card
+                    entity: sensor.kostal_piko_string1_power
+                    name: Leistung
+                    icon: mdi:lightning-bolt
+                    icon_color: deep-orange
+                  - type: custom:mushroom-template-card
+                    primary: String 2
+                    secondary: >-
+                      {{ states('sensor.kostal_piko_string2_voltage') }} V ·
+                      {{ states('sensor.kostal_piko_string2_current') }} A
+                    icon: mdi:current-dc
+                    icon_color: deep-orange
+                    badge_icon: mdi:flash
+                    badge_color: deep-orange
+                  - type: custom:mushroom-entity-card
+                    entity: sensor.kostal_piko_string2_power
+                    name: Leistung
+                    icon: mdi:lightning-bolt
+                    icon_color: deep-orange
+
+              # ---- Inverter centre ----------------------------------------
+              - type: vertical-stack
+                cards:
+                  - type: custom:mushroom-template-card
+                    primary: >-
+                      {{ states('sensor.kostal_piko_string_power') }} W
+                    secondary: DC gesamt
+                    icon: mdi:transmission-tower-export
+                    icon_color: orange
+                    layout: vertical
+                  - type: custom:mushroom-template-card
+                    primary: >-
+                      {{ states('sensor.kostal_piko_efficiency') }} %
+                    secondary: Wirkungsgrad
+                    icon: mdi:cog-transfer
+                    icon_color: >-
+                      {% set e = states('sensor.kostal_piko_efficiency') | float(0) %}
+                      {% if e >= 95 %}green
+                      {% elif e >= 90 %}amber
+                      {% elif e > 0 %}orange
+                      {% else %}grey{% endif %}
+                    layout: vertical
+                  - type: custom:mushroom-template-card
+                    primary: >-
+                      {{ states('sensor.kostal_piko_current_ac_power') }} W
+                    secondary: AC gesamt
+                    icon: mdi:transmission-tower-import
+                    icon_color: light-green
+                    layout: vertical
+                  - type: custom:mushroom-template-card
+                    primary: "{{ states('sensor.kostal_piko_status') }}"
+                    secondary: Status
+                    icon: mdi:solar-power
+                    icon_color: blue
+                    layout: vertical
+
+              # ---- AC side -------------------------------------------------
+              - type: vertical-stack
+                cards:
+                  - type: custom:mushroom-template-card
+                    primary: L1
+                    secondary: "{{ states('sensor.kostal_piko_l1_voltage') }} V"
+                    icon: mdi:sine-wave
+                    icon_color: light-green
+                  - type: custom:mushroom-entity-card
+                    entity: sensor.kostal_piko_l1_power
+                    name: Leistung
+                    icon: mdi:lightning-bolt
+                    icon_color: light-green
+                  - type: custom:mushroom-template-card
+                    primary: L2
+                    secondary: "{{ states('sensor.kostal_piko_l2_voltage') }} V"
+                    icon: mdi:sine-wave
+                    icon_color: light-green
+                  - type: custom:mushroom-entity-card
+                    entity: sensor.kostal_piko_l2_power
+                    name: Leistung
+                    icon: mdi:lightning-bolt
+                    icon_color: light-green
+                  - type: custom:mushroom-template-card
+                    primary: L3
+                    secondary: "{{ states('sensor.kostal_piko_l3_voltage') }} V"
+                    icon: mdi:sine-wave
+                    icon_color: light-green
+                  - type: custom:mushroom-entity-card
+                    entity: sensor.kostal_piko_l3_power
+                    name: Leistung
+                    icon: mdi:lightning-bolt
+                    icon_color: light-green
+
+      # ===== SECTION 3: TIME SERIES ========================================
+      - type: grid
+        cards:
+
+          - type: custom:mushroom-title-card
+            title: Verlauf
+
+          - type: custom:apexcharts-card
+            header:
+              show: true
+              title: Tagesverlauf
+              show_states: true
+              colorize_states: true
+            graph_span: 24h
+            span:
+              start: day
+            apex_config:
+              chart:
+                height: 280
+              stroke:
+                width: 2
+              yaxis:
+                decimalsInFloat: 0
+                min: 0
+            series:
+              - entity: sensor.kostal_piko_current_ac_power
+                name: AC
+                type: area
+                curve: smooth
+                opacity: 0.35
+                group_by:
+                  func: avg
+                  duration: 5min
+              - entity: sensor.kostal_piko_string_power
+                name: DC
+                type: line
+                curve: smooth
+                group_by:
+                  func: avg
+                  duration: 5min
+
+          - type: custom:apexcharts-card
+            header:
+              show: true
+              title: Phasen (Leistung, 6 h)
+            graph_span: 6h
+            chart_type: line
+            apex_config:
+              chart:
+                height: 240
+              stroke:
+                width: 2
+            series:
+              - entity: sensor.kostal_piko_l1_power
+                name: L1
+                group_by: { func: avg, duration: 1min }
+              - entity: sensor.kostal_piko_l2_power
+                name: L2
+                group_by: { func: avg, duration: 1min }
+              - entity: sensor.kostal_piko_l3_power
+                name: L3
+                group_by: { func: avg, duration: 1min }
+
+          - type: custom:apexcharts-card
+            header:
+              show: true
+              title: Tagesenergie (30 Tage)
+            graph_span: 30d
+            span:
+              start: day
+            apex_config:
+              chart:
+                height: 260
+              plotOptions:
+                bar:
+                  borderRadius: 4
+            series:
+              - entity: sensor.kostal_piko_daily_energy
+                name: kWh
+                type: column
+                group_by: { func: max, duration: 1d }
+                statistics:
+                  type: state
+                  period: day
+
+      # ===== SECTION 4 (optional): POWER FLOW =============================
+      # Uncomment after installing power-flow-card-plus AND wiring up your own
+      # grid / battery / consumption sensors. The Kostal integration only
+      # provides the "solar" side; grid + consumption come from your meter.
+      #
+      # - type: grid
+      #   cards:
+      #     - type: custom:mushroom-title-card
+      #       title: Energiefluss
+      #     - type: custom:power-flow-card-plus
+      #       entities:
+      #         solar:
+      #           entity: sensor.kostal_piko_current_ac_power
+      #           name: PV
+      #         grid:
+      #           entity: sensor.your_grid_power_sensor
+      #         home:
+      #           entity: sensor.your_house_consumption_power
+      #       clickable_entities: true
+      #       display_zero_lines: true
+      #       use_new_flow_rate_model: true
+      #       w_decimals: 0
+      #       kw_decimals: 2
+      #       min_flow_rate: 0.75
+      #       max_flow_rate: 6

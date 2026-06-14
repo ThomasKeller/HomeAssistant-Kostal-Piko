@@ -56,6 +56,40 @@ All entities are grouped under one device (`Kostal PIKO`). Energy sensors use
 `total_increasing` so they integrate cleanly with the Home Assistant Energy
 dashboard.
 
+## Companion Dashboards
+
+Two ready-made Lovelace dashboards ship with the integration. Pick whichever
+matches the look you want.
+
+### Option B — Standard ([`dashboards/kostal.yaml`](dashboards/kostal.yaml))
+
+Built from stock Lovelace cards plus a single HACS plugin. Shows live AC
+power and efficiency as gauges, the daily power curve, both PV strings and
+the three AC phases as charts, and a 30-day energy history.
+
+Prerequisite:
+- [`apexcharts-card`](https://github.com/RomRider/apexcharts-card)
+
+### Option C — Mushroom ([`dashboards/kostal-mushroom.yaml`](dashboards/kostal-mushroom.yaml))
+
+Modern look using Mushroom cards, with a 3-column DC → Inverter → AC flow
+visualisation and an optional commented-out section for
+`power-flow-card-plus` if you also have grid/consumption sensors.
+
+Prerequisites:
+- [`apexcharts-card`](https://github.com/RomRider/apexcharts-card)
+- [`mushroom`](https://github.com/piitaya/lovelace-mushroom)
+- [`power-flow-card-plus`](https://github.com/flixlix/power-flow-card-plus)
+  (optional, only for the bottom flow section)
+
+### Installation (both)
+
+Paste the YAML into a new dashboard
+(*Settings → Dashboards → Add Dashboard → from YAML*) or merge the views
+into an existing one via raw configuration editor. If you renamed the
+inverter device, search/replace `sensor.kostal_piko_` with your prefix and
+adjust the AC-power gauge maximum to match your inverter's peak power.
+
 ## Credits
 
 Based on [`TK.HA.Kostal`](https://github.com/) by the same author. HTML

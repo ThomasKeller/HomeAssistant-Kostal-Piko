@@ -1,0 +1,240 @@
+###############################################################################
+# Kostal PIKO companion dashboard
+# -----------------------------------------------------------------------------
+# Requirements:
+#   * Integration "Kostal PIKO (TK)" set up (device id slug: kostal_piko)
+#   * HACS frontend plugin "apexcharts-card" installed
+#     https://github.com/RomRider/apexcharts-card
+#
+# Installation:
+#   1. Settings -> Dashboards -> Add Dashboard -> "From YAML"
+#      (or paste the views below into an existing dashboard in raw config edit)
+#   2. The entity ids below assume the default naming, i.e. the inverter device
+#      is called "Kostal PIKO". If you renamed it, search/replace
+#      "sensor.kostal_piko_" with your prefix.
+#   3. Adjust the gauge max in the AC power gauge to match your inverter
+#      (PIKO 8.3 -> 8500, PIKO 10.1 -> 10100, etc.).
+###############################################################################
+
+title: Photovoltaik
+views:
+  - title: Übersicht
+    path: pv
+    icon: mdi:solar-power
+    cards:
+
+      # ----- HEADER: live values --------------------------------------------
+      - type: horizontal-stack
+        cards:
+          - type: gauge
+            name: AC-Leistung
+            entity: sensor.kostal_piko_current_ac_power
+            min: 0
+            max: 8500           # adjust to your inverter peak power
+            severity:
+              green: 1000
+              yellow: 500
+              red: 0
+            needle: true
+
+          - type: gauge
+            name: Wirkungsgrad
+            entity: sensor.kostal_piko_efficiency
+            min: 0
+            max: 100
+            unit: "%"
+            severity:
+              green: 90
+              yellow: 80
+              red: 0
+            needle: true
+
+          - type: glance
+            title: Heute
+            show_state: true
+            columns: 2
+            entities:
+              - entity: sensor.kostal_piko_daily_energy
+                name: Tagesenergie
+              - entity: sensor.kostal_piko_status
+                name: Status
+              - entity: sensor.kostal_piko_string_power
+                name: PV-DC
+              - entity: sensor.kostal_piko_current_ac_power
+                name: PV-AC
+
+      # ----- TAGESVERLAUF ---------------------------------------------------
+      - type: custom:apexcharts-card
+        header:
+          show: true
+          title: Tagesverlauf AC-Leistung
+          show_states: true
+          colorize_states: true
+        graph_span: 24h
+        span:
+          start: day
+        apex_config:
+          chart:
+            height: 280
+          stroke:
+            width: 2
+          yaxis:
+            decimalsInFloat: 0
+            min: 0
+        series:
+          - entity: sensor.kostal_piko_current_ac_power
+            name: AC
+            type: area
+            curve: smooth
+            opacity: 0.35
+            group_by:
+              func: avg
+              duration: 5min
+          - entity: sensor.kostal_piko_string_power
+            name: DC (String gesamt)
+            type: line
+            curve: smooth
+            group_by:
+              func: avg
+              duration: 5min
+
+      # ----- DC-SEITE: Strings ----------------------------------------------
+      - type: horizontal-stack
+        cards:
+          - type: custom:apexcharts-card
+            header:
+              show: true
+              title: String 1
+              show_states: true
+            graph_span: 6h
+            apex_config:
+              chart:
+                height: 240
+            series:
+              - entity: sensor.kostal_piko_string1_voltage
+                name: Spannung (V)
+                yaxis_id: V
+              - entity: sensor.kostal_piko_string1_current
+                name: Strom (A)
+                yaxis_id: A
+              - entity: sensor.kostal_piko_string1_power
+                name: Leistung (W)
+                yaxis_id: W
+            yaxis:
+              - id: V
+                decimals: 0
+              - id: A
+                decimals: 2
+                opposite: true
+              - id: W
+                show: false
+
+          - type: custom:apexcharts-card
+            header:
+              show: true
+              title: String 2
+              show_states: true
+            graph_span: 6h
+            apex_config:
+              chart:
+                height: 240
+            series:
+              - entity: sensor.kostal_piko_string2_voltage
+                name: Spannung (V)
+                yaxis_id: V
+              - entity: sensor.kostal_piko_string2_current
+                name: Strom (A)
+                yaxis_id: A
+              - entity: sensor.kostal_piko_string2_power
+                name: Leistung (W)
+                yaxis_id: W
+            yaxis:
+              - id: V
+                decimals: 0
+              - id: A
+                decimals: 2
+                opposite: true
+              - id: W
+                show: false
+
+      # ----- AC-SEITE: drei Phasen -----------------------------------------
+      - type: custom:apexcharts-card
+        header:
+          show: true
+          title: AC-Phasen (Leistung)
+          show_states: true
+          colorize_states: true
+        graph_span: 6h
+        chart_type: line
+        apex_config:
+          chart:
+            height: 240
+          stroke:
+            width: 2
+        series:
+          - entity: sensor.kostal_piko_l1_power
+            name: L1
+            group_by:
+              func: avg
+              duration: 1min
+          - entity: sensor.kostal_piko_l2_power
+            name: L2
+            group_by:
+              func: avg
+              duration: 1min
+          - entity: sensor.kostal_piko_l3_power
+            name: L3
+            group_by:
+              func: avg
+              duration: 1min
+
+      - type: glance
+        title: Phasen (Spannung)
+        columns: 3
+        show_state: true
+        entities:
+          - entity: sensor.kostal_piko_l1_voltage
+            name: L1
+          - entity: sensor.kostal_piko_l2_voltage
+            name: L2
+          - entity: sensor.kostal_piko_l3_voltage
+            name: L3
+
+      # ----- HISTORIE: letzte 30 Tage --------------------------------------
+      - type: custom:apexcharts-card
+        header:
+          show: true
+          title: Tagesenergie (30 Tage)
+        graph_span: 30d
+        span:
+          start: day
+        apex_config:
+          chart:
+            height: 260
+          plotOptions:
+            bar:
+              borderRadius: 4
+        series:
+          - entity: sensor.kostal_piko_daily_energy
+            name: kWh
+            type: column
+            group_by:
+              func: max
+              duration: 1d
+            statistics:
+              type: state
+              period: day
+
+      # ----- DIAGNOSE -------------------------------------------------------
+      - type: entities
+        title: Diagnose
+        show_header_toggle: false
+        entities:
+          - entity: sensor.kostal_piko_produced_energy
+            name: Gesamtenergie
+          - entity: sensor.kostal_piko_download_time
+            name: Antwortzeit Wechselrichter
+          - type: attribute
+            entity: sensor.kostal_piko_current_ac_power
+            attribute: friendly_name
+            name: Gerät
